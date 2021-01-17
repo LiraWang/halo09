@@ -9,7 +9,7 @@ use super::{
     errors::KZG10Errors,
     key::{CommitKey, OpeningKey},
 };
-use crate::util;
+use crate::utils;
 use anyhow::{Error, Result};
 use dusk_bls12_381::{G1Affine, G1Projective, G2Affine};
 use rand_core::RngCore;
@@ -45,15 +45,15 @@ impl PublicParameters {
         }
 
         // Generate the secret scalar beta
-        let beta = util::random_scalar(&mut rng);
+        let beta = utils::random_scalar(&mut rng);
 
         // Compute powers of beta up to and including beta^max_degree
-        let powers_of_beta = util::powers_of(&beta, max_degree);
+        let powers_of_beta = utils::powers_of(&beta, max_degree);
 
         // Powers of G1 that will be used to commit to a specified polynomial
-        let g = util::random_g1_point(&mut rng);
+        let g = utils::random_g1_point(&mut rng);
         let powers_of_g: Vec<G1Projective> =
-            util::slow_multiscalar_mul_single_base(&powers_of_beta, g);
+            utils::slow_multiscalar_mul_single_base(&powers_of_beta, g);
         assert_eq!(powers_of_g.len(), max_degree + 1);
 
         // Normalise all projective points
@@ -61,7 +61,7 @@ impl PublicParameters {
         G1Projective::batch_normalize(&powers_of_g, &mut normalised_g);
 
         // Compute beta*G2 element and stored cached elements for verifying multiple proofs.
-        let h: G2Affine = util::random_g2_point(&mut rng).into();
+        let h: G2Affine = utils::random_g2_point(&mut rng).into();
         let beta_h: G2Affine = (h * beta).into();
 
         Ok(PublicParameters {
@@ -118,7 +118,7 @@ mod test {
         let x = BlsScalar::from(10u64);
         let degree = 100u64;
 
-        let powers_of_x = util::powers_of(&x, degree as usize);
+        let powers_of_x = utils::powers_of(&x, degree as usize);
 
         for (i, x_i) in powers_of_x.iter().enumerate() {
             assert_eq!(*x_i, x.pow(&[i as u64, 0, 0, 0]))

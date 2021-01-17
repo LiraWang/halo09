@@ -7,7 +7,7 @@
 //! This module contains an implementation of a polynomial in coefficient form
 //! Where each coefficient is represented using a position in the underlying vector.
 use super::{EvaluationDomain, Evaluations};
-use crate::util;
+use crate::utils;
 use dusk_bls12_381::BlsScalar;
 use rand::Rng;
 use rayon::iter::{
@@ -103,7 +103,7 @@ impl Polynomial {
         }
 
         // Compute powers of points
-        let powers = util::powers_of(point, self.len());
+        let powers = utils::powers_of(point, self.len());
 
         let p_evals: Vec<_> = self
             .par_iter()
@@ -122,7 +122,7 @@ impl Polynomial {
     pub fn rand<R: Rng>(d: usize, mut rng: &mut R) -> Self {
         let mut random_coeffs = Vec::with_capacity(d + 1);
         for _ in 0..=d {
-            random_coeffs.push(util::random_scalar(&mut rng));
+            random_coeffs.push(utils::random_scalar(&mut rng));
         }
         Self::from_coefficients_vec(random_coeffs)
     }

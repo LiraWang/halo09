@@ -8,7 +8,7 @@
 //! that support the generation and usage of Commit and
 //! Opening keys.
 use super::{errors::KZG10Errors, AggregateProof, Commitment, Proof};
-use crate::{fft::Polynomial, transcript::TranscriptProtocol, util};
+use crate::{fft::Polynomial, transcript::TranscriptProtocol, utils};
 use anyhow::{Error, Result};
 use dusk_bls12_381::{
     multiscalar_mul::msm_variable_base, BlsScalar, G1Affine, G1Projective, G2Affine, G2Prepared,
@@ -137,7 +137,7 @@ impl CommitKey {
         transcript: &mut Transcript,
     ) -> Polynomial {
         let challenge = transcript.challenge_scalar(b"aggregate_witness");
-        let powers = util::powers_of(&challenge, polynomials.len() - 1);
+        let powers = utils::powers_of(&challenge, polynomials.len() - 1);
 
         assert_eq!(powers.len(), polynomials.len());
 
@@ -269,7 +269,7 @@ impl OpeningKey {
         let mut total_w = G1Projective::identity();
 
         let challenge = transcript.challenge_scalar(b"batch"); // XXX: Verifier can add their own randomness at this point
-        let powers = util::powers_of(&challenge, proofs.len() - 1);
+        let powers = utils::powers_of(&challenge, proofs.len() - 1);
         // Instead of multiplying g and gamma_g in each turn, we simply accumulate
         // their coefficients and perform a final multiplication at the end.
         let mut g_multiplier = BlsScalar::zero();
